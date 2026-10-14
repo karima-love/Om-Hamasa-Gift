@@ -1,0 +1,356 @@
+/**
+ * Interactive Romantic Experience for Om Hamasa
+ * Pure Vanilla JavaScript (Envelope Choreography, Surprise Poll, Telegram Bot Notification & Audio)
+ */
+
+(function () {
+  function initExperience() {
+    if (window.__omHamasaInitialized) return;
+    window.__omHamasaInitialized = true;
+
+    // Telegram Bot Configuration
+    const TELEGRAM_BOT_TOKEN = "8841362447:AAEY9b_LnmKmyAG7EmmGgeys8PTt-qXuhdA";
+    const TELEGRAM_CHAT_ID = "1804839255";
+
+    // DOM Elements
+    const envelopeScene = document.getElementById("envelopeScene");
+    const envelopeWrapper = document.getElementById("envelopeWrapper");
+    const envelopeHint = document.getElementById("envelopeHint");
+    const loveLetter = document.getElementById("loveLetter");
+    const particleLayer = document.getElementById("particleLayer");
+
+    // Mood Poll Elements
+    const choiceBetter = document.getElementById("choiceBetter");
+    const choiceNeedMore = document.getElementById("choiceNeedMore");
+    const choiceResponse = document.getElementById("choiceResponse");
+    const choiceResponseBadge = document.getElementById("choiceResponseBadge");
+    const choiceResponseText = document.getElementById("choiceResponseText");
+
+    // Audio Elements
+    const bgMusic = document.getElementById("bgMusic");
+    const musicToggle = document.getElementById("musicToggle");
+    const autoplayPrompt = document.getElementById("autoplayPrompt");
+
+    // Experience State
+    let isEnvelopeOpened = false;
+    let isMusicInitialized = false;
+    let lastSentChoice = null;
+
+    const prefersReducedMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ==========================================================================
+       1. TELEGRAM BOT NOTIFICATION SENDER
+       ========================================================================== */
+    async function sendTelegramNotification(choiceTitle, statusDetails) {
+      const timeNow = new Date().toLocaleTimeString("ar-EG", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      const messageText =
+        `💌 <b>إشعار فوري من موقع أم حماصه!</b>\n\n` +
+        `❓ <b>السؤال:</b> طب يا ام حماصه عندنا سؤال مصيري جدا 😂\n` +
+        `👈 <b>الاختيار اللي اختارته:</b> ${choiceTitle}\n` +
+        `📌 <b>الرد اللي ظهرلها:</b> ${statusDetails}\n` +
+        `⏰ <b>الوقت:</b> ${timeNow}`;
+
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+      try {
+        await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: messageText,
+            parse_mode: "HTML",
+          }),
+        });
+      } catch (error) {
+        // Silent catch so network issues never interrupt her experience
+      }
+    }
+
+    /* ==========================================================================
+       2. BACKGROUND MUSIC & AUTOPLAY HANDLING
+       ========================================================================== */
+    if (bgMusic) {
+      bgMusic.volume = 0.3;
+    }
+
+    function syncMusicUI(isPlaying) {
+      document.body.classList.toggle("music-playing", isPlaying);
+      if (musicToggle) {
+        musicToggle.setAttribute("aria-pressed", String(isPlaying));
+        musicToggle.setAttribute(
+          "aria-label",
+          isPlaying ? "إيقاف الموسيقى الخلفية مؤقتا" : "تشغيل الموسيقى الخلفية"
+        );
+      }
+      if (isPlaying && autoplayPrompt && !autoplayPrompt.hidden) {
+        autoplayPrompt.hidden = true;
+      }
+    }
+
+    async function playBackgroundMusic() {
+      if (!bgMusic) return;
+
+      try {
+        await bgMusic.play();
+        isMusicInitialized = true;
+        syncMusicUI(true);
+        removeAutoplayUnlockListeners();
+      } catch (error) {
+        syncMusicUI(false);
+        if (autoplayPrompt) {
+          autoplayPrompt.hidden = false;
+        }
+      }
+    }
+
+    function handleFirstUserInteraction() {
+      if (!bgMusic) return;
+
+      if (autoplayPrompt && !autoplayPrompt.hidden) {
+        autoplayPrompt.hidden = true;
+      }
+
+      if (bgMusic.paused && !isMusicInitialized) {
+        playBackgroundMusic();
+      }
+      removeAutoplayUnlockListeners();
+    }
+
+    function addAutoplayUnlockListeners() {
+      document.addEventListener("click", handleFirstUserInteraction, {
+        passive: true,
+      });
+      document.addEventListener("touchstart", handleFirstUserInteraction, {
+        passive: true,
+      });
+      document.addEventListener("keydown", handleFirstUserInteraction, {
+        passive: true,
+      });
+    }
+
+    function removeAutoplayUnlockListeners() {
+      document.removeEventListener("click", handleFirstUserInteraction);
+      document.removeEventListener("touchstart", handleFirstUserInteraction);
+      document.removeEventListener("keydown", handleFirstUserInteraction);
+    }
+
+    if (musicToggle && bgMusic) {
+      musicToggle.addEventListener("click", async (event) => {
+        event.stopPropagation();
+
+        if (autoplayPrompt && !autoplayPrompt.hidden) {
+          autoplayPrompt.hidden = true;
+        }
+        removeAutoplayUnlockListeners();
+
+        if (bgMusic.paused) {
+          try {
+            await bgMusic.play();
+            isMusicInitialized = true;
+            syncMusicUI(true);
+          } catch (err) {
+            syncMusicUI(false);
+          }
+        } else {
+          bgMusic.pause();
+          syncMusicUI(false);
+        }
+      });
+    }
+
+    if (bgMusic) {
+      bgMusic.addEventListener("play", () => syncMusicUI(true));
+      bgMusic.addEventListener("pause", () => syncMusicUI(false));
+    }
+
+    addAutoplayUnlockListeners();
+    playBackgroundMusic();
+
+    /* ==========================================================================
+       3. PARTICLE BURST EFFECTS (HEARTS & SPARKLES)
+       ========================================================================== */
+    function spawnParticles(originEl, symbols, count = 14) {
+      if (prefersReducedMotion || !particleLayer || !originEl) return;
+
+      const rect = originEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement("span");
+        particle.className = "particle";
+        particle.textContent = symbols[i % symbols.length];
+
+        const offsetX = (Math.random() - 0.5) * Math.min(rect.width * 0.85, 240);
+        const offsetY = (Math.random() - 0.5) * Math.min(rect.height * 0.5, 90);
+        const driftX = (Math.random() - 0.5) * 90;
+        const riseY = -(110 + Math.random() * 110);
+        const size = 14 + Math.random() * 12;
+        const duration = 1.6 + Math.random() * 1.1;
+        const rotation = (Math.random() - 0.5) * 40;
+
+        particle.style.setProperty("--p-x", `${centerX + offsetX}px`);
+        particle.style.setProperty("--p-y", `${centerY + offsetY}px`);
+        particle.style.setProperty("--p-drift", `${driftX}px`);
+        particle.style.setProperty("--p-rise", `${riseY}px`);
+        particle.style.setProperty("--p-size", `${size}px`);
+        particle.style.setProperty("--p-duration", `${duration}s`);
+        particle.style.setProperty("--p-rot", `${rotation}deg`);
+
+        particleLayer.appendChild(particle);
+
+        setTimeout(() => {
+          particle.remove();
+        }, duration * 1000 + 100);
+      }
+    }
+
+    /* ==========================================================================
+       4. ENVELOPE OPENING CHOREOGRAPHY
+       ========================================================================== */
+    function openEnvelope() {
+      if (isEnvelopeOpened) return;
+      isEnvelopeOpened = true;
+
+      if (bgMusic && bgMusic.paused && !isMusicInitialized) {
+        playBackgroundMusic();
+      }
+
+      envelopeWrapper.setAttribute("aria-expanded", "true");
+      envelopeWrapper.classList.add("is-disabled");
+      envelopeWrapper.removeAttribute("tabindex");
+      loveLetter.setAttribute("aria-hidden", "false");
+
+      if (envelopeHint) {
+        envelopeHint.setAttribute("aria-hidden", "true");
+      }
+
+      document.body.classList.add("is-opening");
+      envelopeScene.classList.add("is-opening");
+
+      if (prefersReducedMotion) {
+        document.body.classList.add("is-letter-open");
+        envelopeScene.classList.add("is-opened");
+        return;
+      }
+
+      setTimeout(() => {
+        spawnParticles(envelopeWrapper, ["✦", "❤️", "✨", "💗"], 12);
+      }, 60);
+
+      setTimeout(() => {
+        spawnParticles(envelopeWrapper, ["❤️", "💕", "✨", "💌", "🌸"], 16);
+      }, 480);
+
+      setTimeout(() => {
+        document.body.classList.add("is-letter-open");
+        envelopeScene.classList.add("is-opened");
+
+        setTimeout(() => {
+          loveLetter.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        }, 300);
+      }, 920);
+    }
+
+    if (envelopeWrapper) {
+      envelopeWrapper.addEventListener("click", (event) => {
+        event.preventDefault();
+        openEnvelope();
+      });
+
+      envelopeWrapper.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openEnvelope();
+        }
+      });
+    }
+
+    /* ==========================================================================
+       5. SURPRISE MOOD CHOICES INTERACTION + TELEGRAM TRIGGER
+       ========================================================================== */
+    function selectMoodChoice(choiceType) {
+      if (!choiceResponse || !choiceResponseText || !choiceResponseBadge) return;
+
+      choiceResponse.hidden = false;
+      choiceResponse.style.animation = "none";
+      void choiceResponse.offsetWidth;
+      choiceResponse.style.animation = "";
+
+      if (choiceType === "better") {
+        choiceBetter.classList.add("is-selected");
+        choiceBetter.setAttribute("aria-pressed", "true");
+        choiceNeedMore.classList.remove("is-selected");
+        choiceNeedMore.setAttribute("aria-pressed", "false");
+
+        const replyText = "اااه كده التقرير بيقول ان في تحسن ملحوظ في الحالة 😂❤️";
+        choiceResponse.classList.remove("choice-response--urgent");
+        choiceResponseBadge.textContent = "🎉💖";
+        choiceResponseText.textContent = replyText;
+
+        spawnParticles(choiceBetter, ["❤️", "😂", "✨", "💖", "🌸"], 18);
+
+        // Send Telegram message if not already sent for this exact choice
+        if (lastSentChoice !== "better") {
+          lastSentChoice = "better";
+          sendTelegramNotification("المود بدأ يفوق شوية 😂", replyText);
+        }
+      } else if (choiceType === "more") {
+        choiceNeedMore.classList.add("is-selected");
+        choiceNeedMore.setAttribute("aria-pressed", "true");
+        choiceBetter.classList.remove("is-selected");
+        choiceBetter.setAttribute("aria-pressed", "false");
+
+        const replyText = "بلاغ عاجل تم استدعاء ابو حماصه لزيادة جرعة الدلع فورا ❤️😂";
+        choiceResponse.classList.add("choice-response--urgent");
+        choiceResponseBadge.textContent = "🚨🤗";
+        choiceResponseText.textContent = replyText;
+
+        spawnParticles(choiceNeedMore, ["🤗", "❤️", "💌", "✨", "💕"], 18);
+
+        // Send Telegram message if not already sent for this exact choice
+        if (lastSentChoice !== "more") {
+          lastSentChoice = "more";
+          sendTelegramNotification("لسه محتاجين تدخل ابو حماصه ❤️", replyText);
+        }
+      }
+
+      setTimeout(() => {
+        choiceResponse.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 100);
+    }
+
+    if (choiceBetter) {
+      choiceBetter.addEventListener("click", () => {
+        selectMoodChoice("better");
+      });
+    }
+
+    if (choiceNeedMore) {
+      choiceNeedMore.addEventListener("click", () => {
+        selectMoodChoice("more");
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initExperience);
+  } else {
+    initExperience();
+  }
+})();

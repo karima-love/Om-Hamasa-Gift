@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f8e8ee">
+  <title>رسالة خاصة لأم حماصه 💌</title>
+
+  <!-- Google Fonts with graceful offline system fallbacks -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Hidden HTML5 Background Audio -->
+  <audio id="bgMusic" loop preload="auto" aria-hidden="true">
+    <source src="bg-music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Floating Music Toggle Control (Top-Left Corner) -->
+  <button
+    type="button"
+    id="musicToggle"
+    class="music-control"
+    aria-label="تشغيل أو إيقاف الموسيقى الخلفية"
+    aria-pressed="false"
+    title="الموسيقى"
+  >
+    <span class="music-control__ring" aria-hidden="true"></span>
+    <!-- Playing Icon -->
+    <svg class="music-icon music-icon--playing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 18V5l12-2v13"></path>
+      <circle cx="6" cy="18" r="3"></circle>
+      <circle cx="18" cy="16" r="3"></circle>
+    </svg>
+    <!-- Paused / Muted Icon -->
+    <svg class="music-icon music-icon--paused" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 18V5l12-2v13"></path>
+      <circle cx="6" cy="18" r="3"></circle>
+      <circle cx="18" cy="16" r="3"></circle>
+      <line x1="3" y1="3" x2="21" y2="21" stroke-width="2"></line>
+    </svg>
+  </button>
+
+  <!-- Subtle Autoplay Fallback Prompt (Shown only if browser blocks initial autoplay) -->
+  <div id="autoplayPrompt" class="autoplay-prompt" role="status" aria-live="polite" hidden>
+    <span class="autoplay-prompt__sparkle" aria-hidden="true">✨</span>
+    <span class="autoplay-prompt__text">في موسيقى صغيرة محضراها ليكي يا ام حماصه دوسي في اي حته عشان تشتغل 🎵❤️</span>
+  </div>
+
+  <!-- Ambient Background Layer -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb ambient-orb--blue"></div>
+    <div class="ambient-orb ambient-orb--pink"></div>
+    <div class="ambient-orb ambient-orb--lavender"></div>
+
+    <!-- Delicate Floating SVG Illustrations -->
+    <span class="bg-float bg-float--1">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </span>
+    <span class="bg-float bg-float--2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M22 7l-10 7L2 7"/></svg>
+    </span>
+    <span class="bg-float bg-float--3">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+    </span>
+    <span class="bg-float bg-float--4">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0-6C9.5 2 8 4 8 6c0 1.2.6 2.3 1.5 3-.9.7-1.5 1.8-1.5 3 0 2 1.5 4 4 4s4-2 4-4c0-1.2-.6-2.3-1.5-3 .9-.7 1.5-1.8 1.5-3 0-2-1.5-4-4-4z"/></svg>
+    </span>
+    <span class="bg-float bg-float--5">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </span>
+    <span class="bg-float bg-float--6">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+    </span>
+    <span class="bg-float bg-float--7">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M22 7l-10 7L2 7"/></svg>
+    </span>
+  </div>
+
+  <!-- Particle Container for Burst Effects -->
+  <div id="particleLayer" class="particle-layer" aria-hidden="true"></div>
+
+  <!-- Main Experience Wrapper -->
+  <main class="experience-container">
+
+    <!-- Opening Greeting Header -->
+    <header id="greetingHeader" class="greeting-header">
+      <div class="greeting-badge" aria-hidden="true">
+        <span class="greeting-badge__dot"></span>
+        <span>بث مباشر من مكتب ابو حماصه</span>
+      </div>
+      <h1 class="greeting-title">ابو حماصه بيمسي يا ام حماصه 😂❤️</h1>
+      <p class="greeting-subtitle">وردية تحسين المزاج بدأت رسميا يا فندم</p>
+    </header>
+
+    <!-- Central Interactive Stage -->
+    <section class="stage" aria-label="ظرف الرسالة التفاعلي">
+
+      <!-- Floating Hint Near the Envelope (Not a button) -->
+      <div id="envelopeHint" class="envelope-hint" aria-hidden="true">
+        <span class="envelope-hint__text">في جواب مشبوه وصل لحضرتك دوسي عليه يا ام حماصه 👀💌</span>
+        <svg class="envelope-hint__arrow" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 4 C14 14, 15 22, 18 31"></path>
+          <path d="M12 25 L18 31 L24 25"></path>
+        </svg>
+      </div>
+
+      <!-- Envelope & Letter Scene -->
+      <div id="envelopeScene" class="envelope-scene">
+
+        <!-- Interactive Sealed Envelope -->
+        <div
+          id="envelopeWrapper"
+          class="envelope-wrapper"
+          role="button"
+          tabindex="0"
+          aria-expanded="false"
+          aria-controls="loveLetter"
+          aria-label="ظرف رسالة مغلق بختم الشمع يحمل حرفي MC، اضغطي لفتح الجواب"
+        >
+          <!-- Soft Ambient Shadow Underneath -->
+          <div class="envelope-shadow" aria-hidden="true"></div>
+
+          <!-- The 3D Envelope Body -->
+          <div class="envelope" aria-hidden="true">
+            <!-- Back Wall with Pink Inner Lining -->
+            <div class="envelope__back">
+              <div class="envelope__lining-pattern"></div>
+            </div>
+
+            <!-- Inner Folded Letter Sheet (Slides Upward When Flap Opens) -->
+            <div class="envelope__paper-preview">
+              <div class="paper-preview__header">
+                <span class="paper-preview__monogram" dir="ltr">MC ♥</span>
+              </div>
+              <p class="paper-preview__teaser">مساء الفل على ام حماصه شخصيا 😂❤️</p>
+              <div class="paper-preview__lines">
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <!-- Envelope Front Pocket Flaps (Left, Right, Bottom) -->
+            <div class="envelope__pocket">
+              <div class="envelope__fold envelope__fold--left"></div>
+              <div class="envelope__fold envelope__fold--right"></div>
+              <div class="envelope__fold envelope__fold--bottom">
+                <!-- Handwritten-style Decorative Heart -->
+                <svg class="envelope__handdrawn-heart" viewBox="0 0 40 40" fill="none">
+                  <path d="M20 32 C18 30, 7 22, 7 13.5 C7 8.8, 11 5.5, 15 6.5 C17.8 7.2, 19.3 9.5, 20 11.2 C20.7 9.5, 22.2 7.2, 25 6.5 C29 5.5, 33 8.8, 33 13.5 C33 22, 22 30, 20 32 Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Top Rotating Triangular Flap (3D Transform) -->
+            <div class="envelope__flap">
+              <div class="envelope__flap-outer"></div>
+              <div class="envelope__flap-inner"></div>
+            </div>
+
+            <!-- Custom 3D Wax Seal with MC Initials -->
+            <div class="wax-seal">
+              <span class="seal-sparkle seal-sparkle--1">✦</span>
+              <span class="seal-sparkle seal-sparkle--2">✧</span>
+              <span class="seal-sparkle seal-sparkle--3">✦</span>
+
+              <div class="wax-seal__outer-rim">
+                <div class="wax-seal__inner-ring">
+                  <span class="wax-seal__initials" dir="ltr">MC</span>
+                  <span class="wax-seal__mini-heart">♥</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Emerging Love Letter Card -->
+        <article
+          id="loveLetter"
+          class="letter-card"
+          aria-hidden="true"
+        >
+          <!-- Subtle Unfolding Top Crease Highlight -->
+          <div class="letter-card__crease" aria-hidden="true"></div>
+
+          <!-- Decorative Gold Corner Frame -->
+          <div class="letter-card__inner-frame">
+
+            <!-- Top Meta Header: Handwritten MC Monogram & Abu Hamasa Stamp -->
+            <div class="letter-header">
+              <div class="letter-monogram" dir="ltr" aria-label="شعار MC">
+                <span class="letter-monogram__letters">MC</span>
+                <span class="letter-monogram__heart" aria-hidden="true">♥</span>
+              </div>
+
+              <div class="letter-stamp" aria-label="ختم معتمد من ابو حماصه">
+                <div class="letter-stamp__inner">
+                  <span class="letter-stamp__star" aria-hidden="true">★</span>
+                  <span class="letter-stamp__text">معتمد من ابو حماصه</span>
+                  <span class="letter-stamp__star" aria-hidden="true">★</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actual Letter Content (Exact Egyptian Colloquial Arabic without punctuation or tashkeel) -->
+            <div class="letter-body">
+              <p class="letter-salutation">مساء الفل على ام حماصه شخصيا 😂❤️</p>
+
+              <p class="letter-lead">بصي يا ستي</p>
+
+              <p class="letter-paragraph">
+                تم رصد حالة من التكشيرة الجامعية في محيط ام حماصه وتم ارسال ابو حماصه فورا للتعامل مع الموقف
+              </p>
+
+              <p class="letter-paragraph">
+                بعد الفحص والتحليل تبين ان حضرتك محتاجة جرعة ضحك ودلع واهتمام مع شوية فصلان عن العالم الخارجي
+              </p>
+
+              <p class="letter-paragraph letter-paragraph--highlight">
+                وعليه قررت ادارة ابو حماصه صرف الباكدج الاتية لحضرتك
+              </p>
+
+              <ul class="care-package-list" aria-label="باكدج الدلع المقررة">
+                <li class="care-package-item">
+                  <span class="care-package-item__bullet" aria-hidden="true">✦</span>
+                  <span>حضن كبير اوي من ابو حماصه 🤗</span>
+                </li>
+                <li class="care-package-item">
+                  <span class="care-package-item__bullet" aria-hidden="true">✦</span>
+                  <span>كمية غير قانونية من البوس ❤️</span>
+                </li>
+                <li class="care-package-item">
+                  <span class="care-package-item__bullet" aria-hidden="true">✦</span>
+                  <span>دلع على مدار الساعة بدون اي رسوم اضافية 😂</span>
+                </li>
+                <li class="care-package-item">
+                  <span class="care-package-item__bullet" aria-hidden="true">✦</span>
+                  <span>اعفاء فوري من التفكير في اي حاجة رخمة حصلت النهارده</span>
+                </li>
+              </ul>
+
+              <p class="letter-paragraph">
+                وبمناسبة ان الجامعة ممكن تكون استهلكت كل طاقتك النهارده فمطلوب من حضرتك دلوقتي تاخدي نفس وتريحي دماغك شوية وتفتكري ان في واحد هنا بيحب يشوف ضحكتك وبيحب يهون عليكي اي يوم رخم على قد ما يقدر
+              </p>
+
+              <p class="letter-paragraph letter-paragraph--reassure">
+                ولو لسه مودك مش رايق فمتقلقيش يا ام حماصه دي مش نهاية العالم دي مجرد حلقة فلر في مسلسل حياتك 😂❤️
+              </p>
+
+              <div class="instructions-box">
+                <p class="instructions-box__title">التعليمات الاخيرة</p>
+                <p class="instructions-box__line">ممنوع التكشيرة لمدة خمس دقايق على الاقل</p>
+                <p class="instructions-box__line">ومسموح بطلب الدلع في اي وقت</p>
+                <p class="instructions-box__line">والاعتراض على قرارات ابو حماصه يتم تقديمه شخصيا مع حضن اجباري 😂</p>
+              </div>
+
+              <!-- Handwritten Signature Block -->
+              <div class="letter-signature">
+                <p class="letter-signature__from">من ابو حماصه</p>
+                <p class="letter-signature__to">الى اجمل ام حماصه في المجرة ❤️</p>
+              </div>
+            </div>
+
+            <!-- Decorative Divider -->
+            <div class="letter-divider" aria-hidden="true">
+              <span class="letter-divider__line"></span>
+              <span class="letter-divider__icon">♥</span>
+              <span class="letter-divider__line"></span>
+            </div>
+
+            <!-- Surprise Interactive Section After Reading -->
+            <section class="mood-poll" aria-labelledby="pollQuestion">
+              <h2 id="pollQuestion" class="mood-poll__question">
+                طب يا ام حماصه عندنا سؤال مصيري جدا 😂
+              </h2>
+
+              <div class="mood-poll__choices" role="group" aria-label="اختيارات حالة المزاج">
+                <!-- Choice One -->
+                <button
+                  type="button"
+                  id="choiceBetter"
+                  class="choice-card choice-card--better"
+                  aria-pressed="false"
+                >
+                  <span class="choice-card__tag" aria-hidden="true">الاختيار الأول</span>
+                  <span class="choice-card__label">المود بدأ يفوق شوية 😂</span>
+                </button>
+
+                <!-- Choice Two -->
+                <button
+                  type="button"
+                  id="choiceNeedMore"
+                  class="choice-card choice-card--more"
+                  aria-pressed="false"
+                >
+                  <span class="choice-card__tag" aria-hidden="true">الاختيار الثاني</span>
+                  <span class="choice-card__label">لسه محتاجين تدخل ابو حماصه ❤️</span>
+                </button>
+              </div>
+
+              <!-- Dynamic Response Display Area -->
+              <div
+                id="choiceResponse"
+                class="choice-response"
+                role="status"
+                aria-live="polite"
+                hidden
+              >
+                <div class="choice-response__badge" id="choiceResponseBadge" aria-hidden="true">✨</div>
+                <p id="choiceResponseText" class="choice-response__text"></p>
+              </div>
+            </section>
+
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Subtle Personal Footer -->
+  <footer class="site-footer">
+    <p class="site-footer__text">صناعة ابو حماصه بكل الحب 😂❤️</p>
+  </footer>
+
+  <!-- External Script -->
+  <script src="script.js"></script>
+
+  <!-- Safety Fallback: Ensures the envelope still opens even if script.js was saved with a .txt extension -->
+<!-- External Script -->
+  <script src="script.js"></script>
+
+  <!-- Safety Fallback with Telegram Support -->
+  <script>
+    window.addEventListener("load", function () {
+      if (window.__omHamasaInitialized) return;
+      const BOT_TOKEN = "8841362447:AAEY9b_LnmKmyAG7EmmGgeys8PTt-qXuhdA";
+      const CHAT_ID = "1804839255";
+
+      const scene = document.getElementById("envelopeScene");
+      const wrapper = document.getElementById("envelopeWrapper");
+      const letter = document.getElementById("loveLetter");
+      const hint = document.getElementById("envelopeHint");
+      const btnBetter = document.getElementById("choiceBetter");
+      const btnMore = document.getElementById("choiceNeedMore");
+      const respBox = document.getElementById("choiceResponse");
+      const respText = document.getElementById("choiceResponseText");
+      const respBadge = document.getElementById("choiceResponseBadge");
+      const bgMusic = document.getElementById("bgMusic");
+      let opened = false;
+
+      function notifyTelegram(choice, reply) {
+        fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: "💌 إشعار من أم حماصه!\n👈 اختارت: " + choice + "\n📌 الحالة: " + reply
+          })
+        }).catch(function () {});
+      }
+
+      function fallbackOpen() {
+        if (opened) return;
+        opened = true;
+        if (bgMusic && bgMusic.paused) {
+          bgMusic.volume = 0.3;
+          bgMusic.play().then(function () {
+            document.body.classList.add("music-playing");
+          }).catch(function () {});
+        }
+        wrapper.setAttribute("aria-expanded", "true");
+        wrapper.classList.add("is-disabled");
+        letter.setAttribute("aria-hidden", "false");
+        if (hint) hint.setAttribute("aria-hidden", "true");
+        document.body.classList.add("is-opening");
+        scene.classList.add("is-opening");
+
+        setTimeout(function () {
+          document.body.classList.add("is-letter-open");
+          scene.classList.add("is-opened");
+          setTimeout(function () {
+            letter.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }, 300);
+        }, 900);
+      }
+
+      if (wrapper) {
+        wrapper.addEventListener("click", fallbackOpen);
+      }
+
+      if (btnBetter) {
+        btnBetter.addEventListener("click", function () {
+          const reply = "اااه كده التقرير بيقول ان في تحسن ملحوظ في الحالة 😂❤️";
+          respBox.hidden = false;
+          respBox.classList.remove("choice-response--urgent");
+          respBadge.textContent = "🎉💖";
+          respText.textContent = reply;
+          notifyTelegram("المود بدأ يفوق شوية 😂", reply);
+        });
+      }
+
+      if (btnMore) {
+        btnMore.addEventListener("click", function () {
+          const reply = "بلاغ عاجل تم استدعاء ابو حماصه لزيادة جرعة الدلع فورا ❤️😂";
+          respBox.hidden = false;
+          respBox.classList.add("choice-response--urgent");
+          respBadge.textContent = "🚨🤗";
+          respText.textContent = reply;
+          notifyTelegram("لسه محتاجين تدخل ابو حماصه ❤️", reply);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
